@@ -68,4 +68,6 @@ public interface SmartDoorLock {
      * It sets the lock to the initial state (open).
      */
     void reset();
+
+    int getPin();
 }
