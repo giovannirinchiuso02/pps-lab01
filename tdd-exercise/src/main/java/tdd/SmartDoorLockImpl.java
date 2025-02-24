@@ -4,14 +4,16 @@ public class SmartDoorLockImpl implements SmartDoorLock {
 
     private int pin;
     private boolean isLocked;
+    private boolean isBlocked;
+    private boolean isPinSet;
     private int attempts;
+    public static final int MAX_ATTEMPTS = 3;
 
 
 
-    public SmartDoorLockImpl(final int pin) {
-        this.pin = pin;
-        this.isLocked = true;
-        this.attempts = 0;
+
+    public SmartDoorLockImpl() {
+        this.reset();
     }
 
     @Override
@@ -21,6 +23,7 @@ public class SmartDoorLockImpl implements SmartDoorLock {
         }
         else {
             this.pin = pin;
+            this.isPinSet = true;
         }
     }
 
@@ -31,20 +34,43 @@ public class SmartDoorLockImpl implements SmartDoorLock {
 
 
     @Override
-    public void unlock(int pin) {
-        if (this.pin != pin) {
-            this.attempts++;
-            throw new IllegalArgumentException("This pin is not the same as the real pin");
+    public void unlock(final int pin) {
+        if (isBlocked()) {
+            throw new IllegalStateException("Blocked, cannot unlock");
         }
-        else {
-            this.isLocked = false;
-            this.attempts = 0;
+
+        if (this.pin == pin) {
+            unlockSuccess();
+            return;
         }
+
+        handleFailedAttempt();
     }
+
+    private void unlockSuccess() {
+        this.isLocked = false;
+        this.attempts = 0;
+    }
+
+    private void handleFailedAttempt() {
+        this.attempts++;
+        if (this.attempts >= MAX_ATTEMPTS) {
+            this.isBlocked = true;
+            throw new IllegalStateException("Blocked, cannot unlock");
+        }
+        throw new IllegalArgumentException("Invalid pin");
+    }
+
+
 
     @Override
     public void lock() {
-        this.isLocked = true;
+        if(!this.isPinSet) {
+            throw new IllegalStateException("Before lock, set a pin");
+        }
+        else {
+            this.isLocked = true;
+        }
     }
 
     @Override
@@ -54,12 +80,12 @@ public class SmartDoorLockImpl implements SmartDoorLock {
 
     @Override
     public boolean isBlocked() {
-        return false;
+        return this.isBlocked;
     }
 
     @Override
     public int getMaxAttempts() {
-        return 0;
+        return MAX_ATTEMPTS;
     }
 
     @Override
@@ -69,6 +95,9 @@ public class SmartDoorLockImpl implements SmartDoorLock {
 
     @Override
     public void reset() {
-
+        this.isLocked = false;
+        this.attempts = 0;
+        this.isBlocked = false;
+        this.isPinSet = false;
     }
 }
