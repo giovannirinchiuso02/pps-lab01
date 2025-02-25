@@ -76,6 +76,18 @@ class MinMaxStackImplTest {
        assertThrows(IllegalStateException.class, () -> stack.getMax());
    }
 
+   @Test
+    void testMultiplePop() {
+        this.pushList();
+        for(int i = this.list.size() - 1; i >= 0; i--) {
+            int index = i;
+            assertAll(
+                    () -> assertEquals(list.get(index), stack.pop()),
+                    () -> assertEquals(index, stack.size())
+            );
+        }
+
+   }
 
 
 

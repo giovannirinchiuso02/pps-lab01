@@ -11,6 +11,12 @@ public class MinMaxStackImpl implements MinMaxStack {
         stack = new ArrayList();
     }
 
+    private void checkIsNotEmpty() {
+        if (stack.isEmpty()) {
+            throw new IllegalStateException("Stack is empty");
+        }
+    }
+
     @Override
     public void push(int value) {
         stack.add(value);
@@ -18,35 +24,26 @@ public class MinMaxStackImpl implements MinMaxStack {
 
     @Override
     public int pop() {
-        if (!stack.isEmpty()) {
-            return stack.removeLast();
-        }
-        throw new IllegalStateException("Stack is empty");
+        checkIsNotEmpty();
+        return stack.removeLast();
     }
 
     @Override
     public int peek() {
-        if (!stack.isEmpty()) {
-            return stack.getLast();
-        }
-        throw new IllegalStateException("Stack is empty");
-
+        checkIsNotEmpty();
+        return stack.getLast();
     }
 
     @Override
     public int getMin() {
-        if(!stack.isEmpty()) {
-            return stack.stream().min(Integer::compare).get();
-        }
-        throw new IllegalStateException("Stack is empty");
+        checkIsNotEmpty();
+        return stack.stream().min(Integer::compare).get();
     }
 
     @Override
     public int getMax() {
-        if(!stack.isEmpty()) {
-            return stack.stream().max(Integer::compare).get();
-        }
-        throw new IllegalStateException("Stack is empty");
+        checkIsNotEmpty();
+        return stack.stream().max(Integer::compare).get();
     }
 
     @Override
