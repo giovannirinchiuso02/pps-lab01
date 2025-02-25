@@ -22,4 +22,10 @@ public interface CircularQueue {
     void push(int i);
 
     int peek();
+
+    int pop();
+
+    int getCapacity();
+
+    void setCapacity(int newCapacity);
 }

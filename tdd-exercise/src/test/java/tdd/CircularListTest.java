@@ -2,6 +2,9 @@ package tdd;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -12,8 +15,17 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class CircularListTest {
 
-    List<Integer> list = new LinkedList<>();
-    CircularQueue queue = new CircularQueueImpl();
+    public static final int INITIAL_CAPACITY = 5;
+    public static final int NEW_CAPACITY = 10;
+    CircularQueue queue = new CircularQueueImpl(INITIAL_CAPACITY);
+    List<Integer> longList = new LinkedList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8));
+    List<Integer> shortList = new LinkedList<>(Arrays.asList(1, 2, 3, 4));
+
+    private void pushList(List<Integer> list) {
+        for (int i = 0; i < list.size(); i++) {
+            queue.push(list.get(i));
+        }
+    }
 
     @Test
     void testQueueInitiallyEmpty() {
@@ -27,10 +39,10 @@ public class CircularListTest {
 
     @Test
     void canPush() {
-        queue.push(1);
+        this.pushList(shortList);
         assertAll(
-        () -> assertEquals(1, queue.size()),
-        () -> assertEquals(1, queue.peek()),
+        () -> assertEquals(shortList.size(), queue.size()),
+        () -> assertEquals(shortList.getFirst(), queue.peek()),
         () -> assertFalse(queue.isEmpty()));
     }
 
@@ -41,14 +53,54 @@ public class CircularListTest {
 
     @Test
     void testMultiplePush() {
-        queue.push(1);
-        queue.push(2);
-        queue.push(3);
-        queue.push(4);
+       this.pushList(shortList);
         assertAll(
-                () -> assertEquals(4, queue.size()),
-                () -> assertEquals(1, queue.peek()),
+                () -> assertEquals(shortList.size(), queue.size()),
+                () -> assertEquals(shortList.getFirst(), queue.peek()),
                 () -> assertFalse(queue.isEmpty()));
     }
+
+    @Test
+    void canPop() {
+        this.pushList(shortList);
+        assertAll(
+                () -> assertEquals(shortList.getFirst(), queue.pop()),
+                () -> assertEquals(shortList.size() - 1, queue.size()));
+
+    }
+
+    @Test
+    void canPopWithEmptyList() {
+        assertThrows(IllegalStateException.class, () -> queue.pop());
+    }
+
+    @Test
+    void testMultiplePop() {
+        this.pushList(shortList);
+        for(int i = 0; i < shortList.size(); i++) {
+            assertEquals(shortList.get(i), queue.pop());
+        }
+    }
+
+    @Test
+    void testGetCapacity() {
+        assertEquals(INITIAL_CAPACITY, queue.getCapacity());
+    }
+
+    @Test
+    void testSetCapacity() {
+        queue.setCapacity(NEW_CAPACITY);
+        assertEquals(NEW_CAPACITY, queue.getCapacity());
+    }
+
+    @Test
+    void testPushOverCapacity() {
+        this.pushList(longList);
+        assertAll(
+                () -> assertEquals(longList.get(longList.size() - INITIAL_CAPACITY), queue.peek()),
+                () -> assertEquals(INITIAL_CAPACITY, queue.size())
+        );
+    }
+
 
 }
